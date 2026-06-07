@@ -749,10 +749,16 @@
     // Score absenden (vom Spiel-Script aufgerufen)
     window.submitGlobalScore = function(entry){
       try {
+        // Türme defensiv säubern: nur Typ-String + gerundeter Schaden, max. 3 Einträge.
+        const towers = Array.isArray(entry.towers)
+          ? entry.towers.slice(0,3).map(t=>({ type:String(t.type||"").slice(0,24), dmg:Number(t.dmg)||0 }))
+          : [];
         push(scoresRef, {
           name:  String(entry.name || "Namenlos").slice(0, 24),
           wave:  Number(entry.wave) || 0,
           kills: Number(entry.kills) || 0,
+          gold:  Number(entry.gold) || 0,
+          towers: towers,
           mode:  (entry.mode === "endless") ? "endless" : "classic",
           ts:    Number(entry.ts) || Date.now()
         });
