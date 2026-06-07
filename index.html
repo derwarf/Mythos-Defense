@@ -101,7 +101,7 @@
   /* Ausklapp-Inhalt: schwebt rechts neben der Säule, schiebt das Layout nicht */
   #highscoreFlyout{
     position:absolute; left:calc(100% + 10px); top:50%; transform:translateY(-50%);
-    width:280px; max-height:none;
+    width:340px; max-height:none;
     background:linear-gradient(180deg, var(--panel) 0%, #120f1a 100%);
     border:1px solid var(--panel-line); border-radius:10px; padding:16px;
     box-shadow:0 18px 40px rgba(0,0,0,.55); z-index:61;
@@ -552,16 +552,23 @@
   .talent-choose button{font-size:12px!important;letter-spacing:1px!important;padding:7px!important;
     margin:0!important;}
   /* Highscore-Panel */
-  .hs-empty{font-size:12.5px;color:var(--muted);}
-  .hs-row{display:flex;align-items:center;gap:8px;padding:6px 4px;border-bottom:1px solid var(--panel-line);font-size:13px;}
+  .hs-empty{font-size:13.5px;color:var(--muted);}
+  .hs-row{display:flex;align-items:center;gap:10px;padding:9px 5px;border-bottom:1px solid var(--panel-line);font-size:15px;}
   .hs-row:last-child{border-bottom:none;}
-  .hs-rank{width:20px;text-align:center;font-family:'Caudex';font-weight:700;color:var(--gold-bright);flex-shrink:0;}
-  .hs-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:700;}
-  .hs-stats{font-size:11.5px;color:var(--muted);white-space:nowrap;}
+  .hs-rank{width:24px;text-align:center;font-family:'Caudex';font-weight:700;font-size:16px;color:var(--gold-bright);flex-shrink:0;}
+  .hs-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px;}
+  .hs-name{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:700;font-size:15px;}
+  .hs-stats{font-size:12.5px;color:var(--muted);white-space:nowrap;}
   .hs-row.you{background:rgba(217,178,90,.1);border-radius:5px;}
-  .hs-group+.hs-group{margin-top:12px;}
-  .hs-grouptitle{font-family:'Caudex';font-weight:700;font-size:11px;letter-spacing:1px;
-    color:var(--gold);text-transform:uppercase;margin-bottom:4px;padding-bottom:3px;
+  /* Beste 3 Türme der Runde als kleine Embleme */
+  .hs-towers{display:flex;gap:4px;flex-shrink:0;align-items:center;}
+  .hs-tower{width:26px;height:26px;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;
+    border:1px solid var(--panel-line);background:#1a1320;}
+  .hs-tower img{width:100%;height:100%;object-fit:cover;display:block;}
+  .hs-tower-letter{font-family:'Caudex';font-weight:700;font-size:13px;color:var(--gold);}
+  .hs-group+.hs-group{margin-top:14px;}
+  .hs-grouptitle{font-family:'Caudex';font-weight:700;font-size:12px;letter-spacing:1px;
+    color:var(--gold);text-transform:uppercase;margin-bottom:5px;padding-bottom:4px;
     border-bottom:1px solid var(--panel-line);}
   /* Glücksrad (horizontaler Slot-Streifen) */
   #wheelWindow{position:relative;width:340px;height:90px;overflow:hidden;border-radius:10px;
@@ -993,10 +1000,10 @@ const UNLOCKS={
     check:()=>["mars","jupiter","vulcan"].every(k=>state.towers.some(t=>t.type===k)),
     progress:()=>["mars","jupiter","vulcan"].filter(k=>state.towers.some(t=>t.type===k)).length+" / 3 römische Türme"
   },
-  zeus:{    // Griechenland: Welle 5 mit >=8 Leben erreicht
-    text:"Erreiche Welle 5 mit mind. 8 Leben",
-    check:()=>state.greeceUnlocked===true,
-    progress:()=>state.greeceUnlocked?"erfüllt":"noch nicht erreicht"
+  zeus:{    // Griechenland: 10 Upgrades an beliebigen Türmen getätigt
+    text:"Führe 10 Tower-Upgrades durch (beliebige Türme)",
+    check:()=>(state.totalUpgrades||0)>=10,
+    progress:()=>Math.min(10,state.totalUpgrades||0)+" / 10 Upgrades"
   },
   odin:{    // Nordisch: Thor und Loki auf mind. Level 4
     text:"Bringe Thor und Loki auf Level 4",
@@ -1142,7 +1149,7 @@ const TVAL={
   // ===== ZEUS – Griechenland =====
   // Machtspiele (nur Zeus selbst)
   ze_funkenJumps:1,               // +1 Kettensprung
-  ze_ueberschlagFrac:0.20,        // Kettenblitze verlieren 20% weniger pro Sprung
+  ze_ueberschlagDmgPerKill:1,     // Aufladung: pro eigenem Kill +1 Schaden, dauerhaft (kein Cap)
   ze_gewitterDur:2.5, ze_gewitterFrac:0.06, // elektrisiert: 6% des Treffers/Tick als DoT
   ze_weitwurfRange:0.25,          // +25% Reichweite
   ze_olympEvery:8.0, ze_olympFrac:5.0, ze_olympRadius:70, // periodischer Flächenblitz
@@ -1158,12 +1165,12 @@ const TVAL={
   od_gungnirFrac:0.25,            // +25% Grundschaden
   od_adlerRange:0.25,             // +25% Reichweite
   od_rauschCrit:0.15,             // +15% Krit-Chance
-  od_rabenFrac:0.15, od_rabenDur:3.0, // Krit markiert Ziel: +15% Schaden für 3s
+  od_rabenDmgPerKill:1, // Hugin & Munin: pro eigenem Kill +1 Schaden, dauerhaft (kein Cap)
   od_walhallaFrac:1.5, od_walhallaRadius:55, // Krit -> Explosion (150% am Ziel)
   // Pantheon (alle nordischen Türme)
   od_runenCritFrac:0.25,          // +25% kritischer Schaden (Multiplikator-Aufschlag)
   od_frostSlow:0.7, od_frostSlowDur:1.0, // getroffene Gegner kurz auf 70% Tempo
-  od_jagdFrac:0.12,               // +12% Schaden an markierten Gegnern
+  od_jagdFrac:0.12, od_jagdHpThresh:0.50, // +12% Schaden an geschwächten Gegnern (unter 50% HP)
   od_halleRange:0.10,             // +10% Reichweite
   od_ragnarokFrac:0.05, od_ragnarokDur:3.0, // Bosse: anhaltender Zusatzschaden
 
@@ -1171,9 +1178,9 @@ const TVAL={
   // Machtspiele (nur Kali selbst)
   ka_klingeNormal:0.30, ka_klingeBoss:0.15, // Hinrichtungsschwelle 30% / Bosse 15%
   ka_blutdurstAS:0.40, ka_blutdurstDur:2.0, // Kill -> +40% Tempo für 2s
-  ka_armeChance:0.35, ka_armeFrac:0.6, // 35% Chance, 2. Ziel mit 60% Schaden
+  ka_bossDmgPerBoss:20, // Bosstöter: +20 Schaden pro eigener Bosstötung, dauerhaft (kein Cap)
   ka_totentanzRange:0.15, ka_totentanzAS:0.15, // +15% Reichweite & Tempo
-  ka_pralayaKills:12, ka_pralayaFrac:6.0, ka_pralayaRadius:90, // 12 Kills -> Flächenattacke
+  ka_pralayaKills:12, ka_pralayaFrac:6.0, ka_pralayaRadius:90, ka_pralayaBossMul:2.0, // 12 Kills -> Flächenattacke; Pralaya verdoppelt Kalis Schaden an Bossen
   // Pantheon (alle Hindu-Türme)
   ka_kreislaufFrac:0.15, ka_kreislaufHpThresh:0.40, // +15% Schaden an Gegnern unter 40% Leben
   ka_mantraAS:0.10,               // +10% Angriffstempo
@@ -1237,9 +1244,9 @@ const GOD_TALENTS={
   zeus:{ // Griechenland – Zeus
     machtspiele:[
       {id:"ze_funken",    name:"Funkenschlag",   icon:"⚡", desc:"Zeus' Blitz springt auf einen weiteren Gegner über."},
-      {id:"ze_ueberschlag",name:"Überschlag",    icon:"🔌", desc:"Kettenblitze verlieren weniger Schaden pro Sprung."},
-      {id:"ze_gewitter",  name:"Gewitterfront",  icon:"⛈️", desc:"Getroffene Gegner werden kurz elektrisiert (Zusatzschaden)."},
       {id:"ze_weitwurf",  name:"Weitwurf",       icon:"🎯", desc:"Zeus erhält deutlich mehr Reichweite."},
+      {id:"ze_gewitter",  name:"Gewitterfront",  icon:"⛈️", desc:"Getroffene Gegner werden kurz elektrisiert (Zusatzschaden)."},
+      {id:"ze_ueberschlag",name:"Aufladung",     icon:"🔌", desc:"Zeus lädt sich an seiner Beute auf: pro eigenem Kill erhält Zeus dauerhaft +1 Schaden."},
       {id:"ze_olymp",     name:"Zorn des Olymp", icon:"💥", desc:"Periodisch schlägt ein gewaltiger Blitz mit Flächenschaden ein."}
     ],
     pantheon:[
@@ -1255,13 +1262,13 @@ const GOD_TALENTS={
       {id:"od_gungnir",   name:"Gungnirs Schliff",icon:"🗡️", desc:"Odins Speer trifft härter (mehr Grundschaden)."},
       {id:"od_adlerauge", name:"Adlerauge",      icon:"🦅", desc:"Odin erhält deutlich mehr Reichweite."},
       {id:"od_rausch",    name:"Kriegsrausch",   icon:"⚔️", desc:"Erhöhte kritische Trefferchance."},
-      {id:"od_raben",     name:"Raben Hugin & Munin",icon:"🐦‍⬛", desc:"Kritische Treffer markieren das Ziel: es erleidet kurz mehr Schaden."},
+      {id:"od_raben",     name:"Raben Hugin & Munin",icon:"🐦‍⬛", desc:"Die Raben sammeln die Seelen der Erschlagenen: pro eigenem Kill erhält Odin dauerhaft +1 Schaden."},
       {id:"od_walhalla",  name:"Walhalla",       icon:"💥", desc:"Kritische Treffer lösen eine Schadensexplosion am Ziel aus."}
     ],
     pantheon:[
       {id:"od_runen",     name:"Runenmacht",     icon:"ᛟ", desc:"Nordische Türme verursachen mehr kritischen Schaden."},
       {id:"od_frost",     name:"Frost im Blut",  icon:"❄️", desc:"Nordische Türme verlangsamen getroffene Gegner kurz."},
-      {id:"od_jagd",      name:"Jagdrudel",      icon:"🐺", desc:"Markierte Gegner erleiden mehr Schaden durch nordische Türme."},
+      {id:"od_jagd",      name:"Jagdrudel",      icon:"🐺", desc:"Geschwächte Gegner (unter 50% Leben) erleiden mehr Schaden durch nordische Türme."},
       {id:"od_halle",     name:"Halle der Ahnen",icon:"🏛️", desc:"Alle nordischen Türme erhalten mehr Reichweite."},
       {id:"od_ragnarok",  name:"Ragnarök",       icon:"🔥", desc:"Bosse erleiden anhaltenden Zusatzschaden durch nordische Türme."}
     ]
@@ -1270,9 +1277,9 @@ const GOD_TALENTS={
     machtspiele:[
       {id:"ka_klinge",    name:"Klinge der Zeit",icon:"🗡️", desc:"Kalis Hinrichtungsschwelle steigt – schwächere Gegner sterben früher."},
       {id:"ka_blutdurst", name:"Blutdurst",      icon:"🩸", desc:"Jeder Kill erhöht kurzzeitig Kalis Angriffstempo."},
-      {id:"ka_arme",      name:"Vier Arme",      icon:"🙌", desc:"Kali greift gelegentlich ein zweites Ziel mit an."},
       {id:"ka_totentanz", name:"Totentanz",      icon:"💃", desc:"Erhöhte Reichweite und Angriffstempo."},
-      {id:"ka_pralaya",   name:"Pralaya",        icon:"💥", desc:"Bei genug Kills entfesselt Kali eine vernichtende Flächenattacke."}
+      {id:"ka_arme",      name:"Bosstöter",      icon:"🙌", desc:"Für jeden von Kali getöteten Boss erhält Kali dauerhaft +20 Schaden."},
+      {id:"ka_pralaya",   name:"Pralaya",        icon:"💥", desc:"Bei genug Kills entfesselt Kali eine vernichtende Flächenattacke. Zusätzlich verdoppelt Kali ihren Schaden gegen Bosse."}
     ],
     pantheon:[
       {id:"ka_kreislauf", name:"Kreislauf",      icon:"☸️", desc:"Hindu-Türme erhalten mehr Schaden gegen stark geschwächte Gegner."},
@@ -1981,13 +1988,17 @@ function freshState(){
     speed:1, showRange:false, autoWave:false, nextTowerId:1, paused:false, typeCounts:{}, greeceUnlocked:false, rewarded:{}, bestWave:0,
     rewardDone:{},
     fieldChoiceDone:{}, awaitingFieldPlacement:null, // Bonusfeld-Auswahl nach Welle 5
-    totalKills:0, bossKills:0, mythBought:{}, gameBonus:null, talents:{}, gameTime:0,
+    totalKills:0, totalUpgrades:0, totalGold:0, bossKills:0, mythBought:{}, gameBonus:null, talents:{}, gameTime:0,
     synergyUnlocked:{}, voodooMerged:{}, portals:[]};
 }
 // Gold-Hilfsfunktion mit Spielbonus
 function addGold(amount){
   const mult=(state.gameBonus==="gold")?1.10:1;
-  state.gold+=Math.round(amount*mult);
+  const gain=Math.round(amount*mult);
+  state.gold+=gain;
+  // Kumulatives, im Spielverlauf erhaltenes Gold (für die Highscore-Statistik).
+  // Turmverkäufe laufen NICHT über addGold und zählen daher korrekt nicht mit.
+  state.totalGold=(state.totalGold||0)+Math.max(0,gain);
 }
 
 // ---------- HELFER --------------------------------------------
@@ -3309,7 +3320,7 @@ function upgradeTower(){
   if(tw.special==="aura"||tw.special==="buff"){
     if(tw.upgrades>=BUFF_RANGE_UPGRADES)return;
     const cost=upgradeCost(tw);if(state.gold<cost)return;
-    state.gold-=cost;tw.upgrades++;tw.invested+=cost;
+    state.gold-=cost;tw.upgrades++;tw.invested+=cost;state.totalUpgrades=(state.totalUpgrades||0)+1;
     if(!tw.upStats)tw.upStats={dmg:0,as:0,rng:0};
     tw.range+=BUFF_RANGE_STEP;tw.upStats.rng++;
     showTowerInfo(tw);updateUI();
@@ -3325,7 +3336,7 @@ function upgradeTower(){
   }
   if(tw.upgrades>=MAX_UPGRADES)return;
   const cost=upgradeCost(tw);if(state.gold<cost)return;
-  state.gold-=cost;tw.upgrades++;tw.invested+=cost;
+  state.gold-=cost;tw.upgrades++;tw.invested+=cost;state.totalUpgrades=(state.totalUpgrades||0)+1;
   if(!tw.upStats)tw.upStats={dmg:0,as:0,rng:0}; // Sicherheit für Altstände
   // ZUFÄLLIGEN Wert erhöhen
   const roll=Math.random();let what;
@@ -3415,6 +3426,8 @@ function damageEnemy(enemy,dmg,tower,ignoreArmor){
     }
     if(enemy.isBoss){
       state.bossKills++;                       // für Maya-Mission
+      // Kali – Bosstöter: pro eigener Bosstötung dauerhaft +20 Schaden (zählt nur Kalis eigene Kills)
+      if(tower&&tower.type==="kali"&&hasTalent("kali","ka_arme")) tower.bossKills=(tower.bossKills||0)+1;
       // Talentpunkte (nur Hauptgötter): jeder vertretene Hauptgott-TYP erhält +1 für den
       // Bosskill (Turm-Anzahl egal); der Typ des tötenden Turms erhält +1 weiteren.
       const mainTypesPresent=new Set(state.towers.filter(tw=>isMainGod(tw.type)).map(tw=>tw.type));
@@ -4522,7 +4535,7 @@ function talentHitMul(tw,en){
   }
   // ===== NORDISCH / Odin (Pantheon) =====
   if(tw.myth==="norse"){
-    if(mythHasTalent("norse","od_jagd") && (en.markT||0)>0) mul+=TVAL.od_jagdFrac; // an Markierten
+    if(mythHasTalent("norse","od_jagd") && en.maxHp>0 && en.hp<=en.maxHp*TVAL.od_jagdHpThresh) mul+=TVAL.od_jagdFrac; // an geschwächten Gegnern (<50% HP)
   }
   // ===== HINDU / Kali (Pantheon) =====
   if(tw.myth==="hindu"){
@@ -4644,7 +4657,13 @@ function effDamage(tw){
   const powBonus=mythPower(tw.myth)-1;                 // +0.05 / +0.10 / 0
   const completeBonus=mythComplete(tw.myth)?MYTH_BONUS:0; // +0.20 wenn Mythologie komplett
   const fieldBonus=(tw.slot&&tw.slot.boost==="dmg")?0.30:0; // +30% Schaden-Feld
-  return tw.damage * (1 + powBonus + completeBonus + fieldBonus + talentFlatDmgFrac(tw) + (tw.buffDmg||0) + voodooBuff("dmg")) * milestoneDmgMul(tw);
+  // Flacher Bonus von +1 Schaden je eigenem Kill (dauerhaft, kein Cap):
+  // Odin – Raben Hugin & Munin sowie Zeus – Aufladung.
+  let killFlat=0;
+  if(tw.type==="odin" && hasTalent("odin","od_raben")) killFlat+=(tw.kills||0)*TVAL.od_rabenDmgPerKill;
+  if(tw.type==="zeus" && hasTalent("zeus","ze_ueberschlag")) killFlat+=(tw.kills||0)*TVAL.ze_ueberschlagDmgPerKill;
+  if(tw.type==="kali" && hasTalent("kali","ka_arme")) killFlat+=(tw.bossKills||0)*TVAL.ka_bossDmgPerBoss;
+  return (tw.damage + killFlat) * (1 + powBonus + completeBonus + fieldBonus + talentFlatDmgFrac(tw) + (tw.buffDmg||0) + voodooBuff("dmg")) * milestoneDmgMul(tw);
 }
 // effektives Angriffstempo inkl. Tempo-Feld (+30%), Talent-Boni und Bacchus-Weinboost
 function effAttackSpeed(tw){
@@ -4708,8 +4727,7 @@ function hitTarget(pr){
       damageEnemy(en,d*(c?critMul:1),tw,false);
       if(c){
         state.effects.push({type:"ring",x:en.x,y:en.y,t:0.25,color:tw.rgb});
-        // Odin – Raben: Krit markiert das Ziel (verwundbar für Jagdrudel)
-        if(tw.type==="odin" && hasTalent("odin","od_raben")) en.markT=Math.max(en.markT||0,TVAL.od_rabenDur);
+        // (Raben Hugin & Munin geben jetzt +1 Schaden pro Kill – siehe effDamage; keine Markierung mehr.)
         // Odin – Walhalla: Krit-Explosion
         if(tw.type==="odin" && hasTalent("odin","od_walhalla"))
           aoeDamage(en.x,en.y,TVAL.od_walhallaRadius,d*TVAL.od_walhallaFrac,tw,false,en);
@@ -4719,6 +4737,9 @@ function hitTarget(pr){
       }
       break;}
     case"execute":{
+      // Pralaya: Kali macht doppelten Schaden gegen Bosse (unabhängig von der Flächenattacke)
+      let de=d;
+      if(tw.type==="kali" && hasTalent("kali","ka_pralaya") && en.isBoss) de=d*TVAL.ka_pralayaBossMul;
       // Hinrichtungsschwelle inkl. Kali-Talent "Klinge der Zeit"
       let thr=en.isBoss?spv(tw,"executeThresholdBoss"):spv(tw,"executeThreshold");
       if(tw.type==="kali" && hasTalent("kali","ka_klinge")) thr=en.isBoss?TVAL.ka_klingeBoss:TVAL.ka_klingeNormal;
@@ -4726,15 +4747,9 @@ function hitTarget(pr){
       if(executed){
         // Kali – Zorn der Göttin: Hinrichtung löst Flächenschaden aus
         if(tw.type==="kali" && hasTalent("kali","ka_zorn"))
-          aoeDamage(en.x,en.y,TVAL.ka_zornRadius,d*TVAL.ka_zornFrac,tw,true,en);
+          aoeDamage(en.x,en.y,TVAL.ka_zornRadius,de*TVAL.ka_zornFrac,tw,true,en);
         damageEnemy(en,en.hp+999,tw,true);
-      } else damageEnemy(en,d,tw,false);
-      // Kali – Vier Arme: gelegentlich ein zweites Ziel mit angreifen
-      if(tw.type==="kali" && hasTalent("kali","ka_arme") && Math.random()<TVAL.ka_armeChance){
-        let second=null,nd=effRange(tw);
-        for(const o of state.enemies){ if(o===en||o.dead)continue; const dd=dist(tw.x,tw.y,o.x,o.y); if(dd<nd){nd=dd;second=o;} }
-        if(second){ damageEnemy(second,d*TVAL.ka_armeFrac,tw,false); state.effects.push({type:"bolt",x1:en.x,y1:en.y,x2:second.x,y2:second.y,t:0.15,color:tw.rgb}); }
-      }
+      } else damageEnemy(en,de,tw,false);
       break;}
     case"burn": en.burnSource=tw;damageEnemy(en,d,tw,false);
       en.burnStacks=Math.min((en.burnStacks||0)+1,SP.burnMaxStacks); // bis 3 Stapel
@@ -4748,9 +4763,8 @@ function hitTarget(pr){
       let jumps=spv(tw,"chainJumps");
       if(tw.type==="zeus" && hasTalent("zeus","ze_funken")) jumps+=TVAL.ze_funkenJumps;
       if(tw.myth==="greece" && mythHasTalent("greece","ze_donner")) jumps+=TVAL.ze_donnerJumps;
-      // Schadensverlust pro Sprung: Überschlag reduziert den Verlust
+      // Schadensverlust pro Sprung (Aufladung wirkt jetzt über effDamage als +1/Kill, nicht mehr hier)
       let chainFrac=spv(tw,"chainFrac");
-      if(tw.type==="zeus" && hasTalent("zeus","ze_ueberschlag")) chainFrac=Math.min(1,chainFrac+(1-chainFrac)*TVAL.ze_ueberschlagFrac);
       const hit=[en];let from=en;let curFrac=chainFrac;
       for(let i=0;i<jumps;i++){
         let nx=null,nd=SP.chainRange;
@@ -5676,7 +5690,12 @@ function saveScore(){
   let name=(inp.value||"").trim();
   if(!name)name="Namenlos";
   window._lastName=name; // Name für eine evtl. spätere Eingabe (z. B. Endlos-Ende) merken
-  const entryObj={name, wave:state.wave, kills:state.totalKills, ts:Date.now(), mode:_pendingMode};
+  // Top-3-Türme der Runde nach verursachtem Schaden (für die Highscore-Anzeige als kleine Bilder)
+  const topTowers=[...state.towers]
+    .sort((a,b)=>(b.dmgDealt||0)-(a.dmgDealt||0))
+    .slice(0,3)
+    .map(t=>({type:t.type, dmg:Math.round(t.dmgDealt||0)}));
+  const entryObj={name, wave:state.wave, kills:state.totalKills, gold:Math.round(state.totalGold||0), ts:Date.now(), mode:_pendingMode, towers:topTowers};
   // neuen Eintrag in die bestehende Liste aufnehmen ...
   const list=loadHighscores();
   list.push(entryObj);
@@ -5725,6 +5744,22 @@ function hsGlobalSection(){
   return hsSection("🌍 Global · ∞ Endlos", endless) +
          hsSection("🌍 Global · 🏛 bis Welle 30", classic);
 }
+// Die besten Türme eines Eintrags als kleine Bilder (sofern gespeichert).
+// Alte/globale Einträge ohne towers-Feld liefern leeren String.
+function hsTowerIcons(e){
+  if(!e.towers||!e.towers.length)return "";
+  let imgs="";
+  for(const t of e.towers){
+    const info=TOWER_TYPES[t.type];
+    const nm=info?info.name:t.type;
+    const tip=`${nm} · ${Number(t.dmg||0).toLocaleString("de-DE")} Schaden`;
+    const img=(TOWER_IMG[t.type]&&TOWER_IMG[t.type].src)
+      ? `<img src="${TOWER_IMG[t.type].src}" alt="${nm}">`
+      : `<span class="hs-tower-letter">${info?info.letter:"?"}</span>`;
+    imgs+=`<span class="hs-tower" title="${tip}">${img}</span>`;
+  }
+  return `<span class="hs-towers">${imgs}</span>`;
+}
 // Eine Highscore-Teilliste (max. 10) als HTML rendern
 function hsSection(title, list){
   const last=window._lastScore;
@@ -5735,10 +5770,14 @@ function hsSection(title, list){
     list.slice(0,10).forEach((e,i)=>{
       const you=last&&e.name===last.name&&e.wave===last.wave&&e.kills===last.kills&&e.ts===last.ts;
       const safeName=String(e.name||"Namenlos").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+      const goldStr=(e.gold!=null)?` · ${Number(e.gold).toLocaleString("de-DE")} 🪙`:"";
       rows+=`<div class="hs-row${you?" you":""}">
         <span class="hs-rank">${i+1}</span>
-        <span class="hs-name">${safeName}</span>
-        <span class="hs-stats">Welle ${e.wave} · ${e.kills} Kills</span>
+        <div class="hs-main">
+          <span class="hs-name">${safeName}</span>
+          <span class="hs-stats">Welle ${e.wave} · ${e.kills} Kills${goldStr}</span>
+        </div>
+        ${hsTowerIcons(e)}
       </div>`;
     });
   }
