@@ -1699,8 +1699,9 @@ const SP = {
   stunChance:0.25, stunDur:0.8,                  // Betäubung (Ganesha)
   pierceMax:3,                                   // Durchschlag mehrerer Gegner (Rama)
   poisonDur:3.5, poisonInterval:1.0, poisonMaxHpFrac:0.015, // Gift: % des Max-HP je Tick, 1s-Takt, genau 3 Ticks (Ah Puch)
-  // Absolute Obergrenzen pro Tick für %-Max-HP-DoTs (verhindern Endgame-Explosion gegen Riesen-HP-Bosse)
-  poisonTickCap:120, decayTickCap:100, bleedTickCap:90,
+  // Tick-Caps für %-Max-HP-DoTs: 5× der ursprünglichen Werte. Gelten für ALLE Gegner (Mobs wie Bosse).
+  // Bei normalen Mobs greifen sie faktisch nie (zu wenig Max-HP); relevant nur gegen sehr hohe HP (~40k+).
+  poisonTickCap:600, decayTickCap:500, bleedTickCap:450,
   auraMaxHpFrac:0.10, auraArmorFrac:0.40,        // Hades-Aura: −10% max. Leben, −40% Rüstung
   buffRangeFrac:0.10, buffDmgFrac:0.20,          // Jupiter-Buff: +10% Reichweite, +20% Schaden (für Türme in Reichweite)
   tricksterApproach:0.8, tricksterRetreat:2.2,    // Loki gegen Bosse: zulaufend 80% / weglaufend 220%
