@@ -509,7 +509,9 @@
   .syn-card .syn-sym.has-img{background:none;overflow:hidden;padding:0;}
   .syn-card .syn-sym.has-img img{width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;}
   .syn-card .syn-name{font-family:'Caudex';font-weight:700;font-size:12.5px;color:var(--text);line-height:1.15;}
-  .syn-card .syn-desc{font-size:10.5px;color:var(--muted);line-height:1.3;}
+  .syn-card .syn-desc{font-size:10.5px;color:var(--muted);line-height:1.3;
+    max-height:0;opacity:0;overflow:hidden;transition:max-height .2s ease,opacity .2s ease,margin .2s ease;margin:0;}
+  .syn-card:hover .syn-desc,.syn-card:focus-within .syn-desc{max-height:80px;opacity:1;margin-top:1px;}
   .syn-card .syn-state{font-size:10px;font-family:'Caudex';font-weight:700;margin-top:2px;}
   .syn-card.pickable{cursor:pointer;border-color:var(--gold);box-shadow:0 0 10px rgba(217,178,90,.25);}
   .syn-card.pickable:hover{transform:translateY(-2px);box-shadow:0 0 16px rgba(242,205,122,.5);}
@@ -1431,8 +1433,8 @@ const VOODOO_GODS={
   samedi:{
     id:"samedi", name:"Baron Samedi", letter:"§", meaning:"Tod & Wiedergeburt",
     icon:"💀", rgb:"#b8b0c8",
-    parents:["ahpuch","hades"],            // Ah Puch (Maya) + Hades (Griechenland)
-    desc:"Loa des Todes und der Gräber. Greift an UND umgibt sich mit einer Grab-Aura, die Gegner für das Begräbnis markiert.",
+    parents:["ahpuch","hades"], role:"Damage / Crowd Control",            // Ah Puch (Maya) + Hades (Griechenland)
+    desc:"Fusion: Ah Puch + Hades. Rolle: Damage / Crowd Control (Grab-Aura).",
     stats:{damage:140, attackSpeed:1.0, range:130, special:"splash"},
     hasAura:true,                          // Hybrid: greift an UND hat Aura
     buff:{kind:"dmg", frac:0.15}           // +15% Schaden für ALLE Türme
@@ -1440,8 +1442,8 @@ const VOODOO_GODS={
   voodoo2:{
     id:"voodoo2", name:"Erzulie Rouge", letter:"❦", meaning:"Leidenschaft & Rausch",
     icon:"🌹", rgb:"#d35b78",
-    parents:["freyja","bacchus"],          // Freyja (Nordisch) + Bacchus (Rom)
-    desc:"Loa der Liebe und des Blutrauschs. Greift an UND verzaubert regelmäßig den stärksten Gegner in Reichweite ('Blood Charm').",
+    parents:["freyja","bacchus"], role:"Crowd Control",          // Freyja (Nordisch) + Bacchus (Rom)
+    desc:"Fusion: Freyja + Bacchus. Rolle: Crowd Control (Charm).",
     stats:{damage:120, attackSpeed:1.2, range:120, special:"chain"},
     hasCharm:true,                         // periodischer Charm auf den stärksten Gegner
     buff:{kind:"as", frac:0.12}            // +12% Angriffstempo für ALLE Türme
@@ -1449,8 +1451,8 @@ const VOODOO_GODS={
   voodoo3:{
     id:"voodoo3", name:"Legba der Schattenwege", letter:"⛧", meaning:"Kreuzwege & Übergänge",
     icon:"🚪", rgb:"#7d9ec8",
-    parents:["loki","anubis"],             // Loki (Nordisch) + Anubis (Ägypten)
-    desc:"Loa der Kreuzwege und Tore. Greift an UND öffnet Schattenportale ('Crossroad Swap'), die Gegner zurückwerfen.",
+    parents:["loki","anubis"], role:"Crowd Control / Support",             // Loki (Nordisch) + Anubis (Ägypten)
+    desc:"Fusion: Loki + Anubis. Rolle: Crowd Control / Support (Portale).",
     stats:{damage:110, attackSpeed:1.0, range:140, special:"pierce"},
     hasPortals:true,                       // erschafft periodisch ein Portalpaar auf dem Pfad
     buff:{kind:"rngspeed", frac:0.08}      // +8% Reichweite UND +8% Tempo für ALLE Türme
@@ -1458,8 +1460,8 @@ const VOODOO_GODS={
   voodoo4:{
     id:"voodoo4", name:"Damballah Solair", letter:"☀", meaning:"Sonne & göttliche Schlange",
     icon:"🐍", rgb:"#f0c64a",
-    parents:["ra","apollo"],               // Ra (Ägypten) + Apollon (Griechenland)
-    desc:"Loa der Himmelsschlange. Greift an UND lässt eine goldene Sonnenschlange über die Map kreisen, die Gegner mit 'Sun Sigil' markiert.",
+    parents:["ra","apollo"], role:"Support / Damage",               // Ra (Ägypten) + Apollon (Griechenland)
+    desc:"Fusion: Ra + Apollon. Rolle: Support / Damage (Verwundbarkeits-Mark).",
     stats:{damage:130, attackSpeed:0.9, range:125, special:"crit"},
     hasSerpent:true,                       // kreisende Sonnenschlange, die markiert
     buff:{kind:"dmgrng", frac:0.10}        // +10% Schaden, +5% Reichweite (Range = halber Wert)
@@ -1467,8 +1469,8 @@ const VOODOO_GODS={
   voodoo5:{
     id:"voodoo5", name:"Ogou Tonnerre", letter:"⚔", meaning:"Krieg, Eisen & Donner",
     icon:"⚡", rgb:"#9fb6d8",
-    parents:["thor","chaac"],              // Thor (Nordisch) + Chaac (Maya)
-    desc:"Loa des Krieges und Donners. Greift an, schlägt jeden dritten Schlag einen massiven Kettenblitz, bricht Rüstung und treibt nahe Türme mit der Kriegstrommel an.",
+    parents:["thor","chaac"], role:"Damage / Support",              // Thor (Nordisch) + Chaac (Maya)
+    desc:"Fusion: Thor + Chaac. Rolle: Damage (Kettenblitz) / Support (Kriegstrommel).",
     stats:{damage:150, attackSpeed:0.8, range:120, special:"chain"},
     hasWarDrum:true,                       // Donnerschlag-Zähler + Kriegstrommel-Aura
     buff:{kind:"dmgas", frac:0.10}         // +10% Schaden, +6% Tempo (AS = 0.6× Wert)
@@ -1480,9 +1482,10 @@ const VOODOO_ORDER=["samedi","voodoo2","voodoo3","voodoo4","voodoo5"];
 // pickTalent/learnTalent behandeln den Pfad "synergien" gesondert (Einzelauswahl, 5 Punkte).
 const SYNERGY_TALENTS=VOODOO_ORDER.map(id=>{
   const v=VOODOO_GODS[id];
-  const buffLbl={dmg:"Schaden",as:"Tempo",rng:"Reichweite"}[v.buff.kind];
+  const p1=(TOWER_TYPES[v.parents[0]]&&TOWER_TYPES[v.parents[0]].name)||v.parents[0];
+  const p2=(TOWER_TYPES[v.parents[1]]&&TOWER_TYPES[v.parents[1]].name)||v.parents[1];
   return {id, name:v.name, icon:v.icon,
-    desc:`Verschmilzt zwei Götter (beide Stufe ${MERGE_MIN_LEVEL}) zu <b>${v.name}</b> – einem überlegenen Voodoo-Turm. Gewährt zusätzlich +${Math.round(v.buff.frac*100)}% ${buffLbl} für ALLE Türme. Kostet ${SYNERGY_COST} Talentpunkte. Einmal freigeschaltet, gilt der Merge für das ganze Spiel.`};
+    desc:`Fusion: ${p1} + ${p2}. Rolle: ${v.role}.`};
 });
 // In alle Hauptgott-Talentbäume einhängen.
 for(const mg of MAIN_GODS){ if(GOD_TALENTS[mg]) GOD_TALENTS[mg].synergien=SYNERGY_TALENTS; }
