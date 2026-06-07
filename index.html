@@ -704,6 +704,70 @@
 
 </div>
 
+<!-- ============================================================
+     FIREBASE: globale Rangliste (Realtime Database)
+     Läuft als ES-Modul und legt Hilfsfunktionen auf window ab,
+     damit das klassische Spiel-Script darauf zugreifen kann.
+     Fällt das Laden aus (offline o.ä.), läuft das Spiel normal
+     mit rein lokalen Highscores weiter.
+     ============================================================ -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+  import { getDatabase, ref, push, query, orderByChild, limitToLast, onValue }
+    from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyB8WYlIEnnlUo2lf1SNAkgqBD0DJIB7LwU",
+    authDomain: "mythos-defense-84d39.firebaseapp.com",
+    databaseURL: "https://mythos-defense-84d39-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "mythos-defense-84d39",
+    storageBucket: "mythos-defense-84d39.firebasestorage.app",
+    messagingSenderId: "552274780544",
+    appId: "1:552274780544:web:d2f71c99c02ef7d0142165",
+    measurementId: "G-DXW7P5ZFJM"
+  };
+
+  // Globaler Zustand, den das Spiel-Script liest
+  window._globalScores = null;        // null = noch nicht geladen, [] = leer
+  window._globalScoreError = false;   // true = Firebase nicht erreichbar
+  window.submitGlobalScore = function(){ /* wird unten ersetzt, sobald init klappt */ };
+
+  try {
+    const app = initializeApp(firebaseConfig);
+    const db  = getDatabase(app);
+    const scoresRef = ref(db, "scores");
+
+    // Score absenden (vom Spiel-Script aufgerufen)
+    window.submitGlobalScore = function(entry){
+      try {
+        push(scoresRef, {
+          name:  String(entry.name || "Namenlos").slice(0, 24),
+          wave:  Number(entry.wave) || 0,
+          kills: Number(entry.kills) || 0,
+          mode:  (entry.mode === "endless") ? "endless" : "classic",
+          ts:    Number(entry.ts) || Date.now()
+        });
+      } catch(e) { /* still: lokaler Score ist schon gespeichert */ }
+    };
+
+    // Live-Abo: die besten Einträge nach Welle. Wir holen großzügig viele
+    // und sortieren/filtern dann im Browser nach Modus.
+    const topQuery = query(scoresRef, orderByChild("wave"), limitToLast(200));
+    onValue(topQuery, (snap) => {
+      const arr = [];
+      snap.forEach(child => { const v = child.val(); if(v) arr.push(v); });
+      window._globalScores = arr;
+      window._globalScoreError = false;
+      if (typeof window.buildHighscores === "function") window.buildHighscores();
+    }, (err) => {
+      window._globalScoreError = true;
+      if (typeof window.buildHighscores === "function") window.buildHighscores();
+    });
+  } catch(e) {
+    window._globalScoreError = true;
+  }
+</script>
+
 <script>
 // ============================================================
 //  MYTHOS DEFENSE
@@ -5617,6 +5681,8 @@ function saveScore(){
   const trimmed=[...sortedHighscores("classic").slice(0,20), ...sortedHighscores("endless").slice(0,20)];
   storeHighscores(trimmed);
   window._lastScore=entryObj; // zum Hervorheben
+  // Zusätzlich an die globale Rangliste senden (falls Firebase verfügbar).
+  if(typeof window.submitGlobalScore==="function"){ try{ window.submitGlobalScore(entryObj); }catch(e){} }
   const btn=document.getElementById('saveScoreBtn');
   btn.disabled=true; btn.textContent="Gespeichert ✓";
   buildHighscores();
@@ -5626,12 +5692,34 @@ function buildHighscores(){
   const body=document.getElementById('highscoreBody'); if(!body)return;
   const classic=sortedHighscores("classic");
   const endless=sortedHighscores("endless");
-  if(classic.length===0 && endless.length===0){
-    body.innerHTML='<div class="hs-empty">Noch keine Einträge. Spiele eine Runde und trage dich ein!</div>'; return;
+  let html =
+    hsGlobalSection() +
+    hsSection("∞ Endlosspiele (lokal)", endless) +
+    hsSection("🏛 Spiele bis Welle 30 (lokal)", classic);
+  body.innerHTML = html;
+}
+// Globale Rangliste (aus Firebase). Zeigt einen Status, solange noch nichts
+// geladen ist, und teilt die Einträge nach Endlos / Klassisch auf.
+function hsGlobalSection(){
+  const g=window._globalScores;
+  if(window._globalScoreError){
+    return `<div class="hs-group"><div class="hs-grouptitle">🌍 Globale Rangliste</div>`+
+           `<div class="hs-empty">Globale Rangliste gerade nicht erreichbar – lokale Bestenliste siehe unten.</div></div>`;
   }
-  body.innerHTML =
-    hsSection("∞ Endlosspiele", endless) +
-    hsSection("🏛 Spiele bis Welle 30", classic);
+  if(g===null||g===undefined){
+    return `<div class="hs-group"><div class="hs-grouptitle">🌍 Globale Rangliste</div>`+
+           `<div class="hs-empty">Globale Rangliste wird geladen …</div></div>`;
+  }
+  const sortFilter=(mode)=>g.filter(e=>(e.mode||"classic")===mode)
+                            .sort((a,b)=>(b.wave-a.wave)||(b.kills-a.kills));
+  const endless=sortFilter("endless");
+  const classic=sortFilter("classic");
+  if(endless.length===0 && classic.length===0){
+    return `<div class="hs-group"><div class="hs-grouptitle">🌍 Globale Rangliste</div>`+
+           `<div class="hs-empty">Noch keine globalen Einträge. Sei der oder die Erste!</div></div>`;
+  }
+  return hsSection("🌍 Global · ∞ Endlos", endless) +
+         hsSection("🌍 Global · 🏛 bis Welle 30", classic);
 }
 // Eine Highscore-Teilliste (max. 10) als HTML rendern
 function hsSection(title, list){
@@ -5642,7 +5730,7 @@ function hsSection(title, list){
   } else {
     list.slice(0,10).forEach((e,i)=>{
       const you=last&&e.name===last.name&&e.wave===last.wave&&e.kills===last.kills&&e.ts===last.ts;
-      const safeName=e.name.replace(/</g,"&lt;").replace(/>/g,"&gt;");
+      const safeName=String(e.name||"Namenlos").replace(/</g,"&lt;").replace(/>/g,"&gt;");
       rows+=`<div class="hs-row${you?" you":""}">
         <span class="hs-rank">${i+1}</span>
         <span class="hs-name">${safeName}</span>
@@ -5654,6 +5742,8 @@ function hsSection(title, list){
 }
 
 state=freshState();
+// buildHighscores für das Firebase-Modul erreichbar machen (Live-Updates der globalen Liste)
+window.buildHighscores=buildHighscores;
 buildHighscores();
 // Enter im Namensfeld speichert den Highscore
 document.getElementById('playerName').addEventListener('keydown',e=>{
