@@ -938,27 +938,27 @@ const TOWER_TYPES={
            desc:"Sonnengott. Setzt Gegner in Brand (Schaden über Zeit)."},
   anubis: {name:"Anubis", myth:"egypt", letter:"A", cost:130, damage:34, attackSpeed:0.7, range:105, special:"execute",
            desc:"Totengott. Richtet Gegner unter 20% Leben sofort hin."},
-  horus:  {name:"Horus",  myth:"egypt", letter:"H", cost:90,  damage:32, attackSpeed:1.1, range:180, special:"sight",
+  horus:  {name:"Horus",  myth:"egypt", letter:"H", cost:100, damage:29, attackSpeed:1.1, range:180, special:"sight",
            desc:"Falkengott. Sehr große Reichweite über das ganze Feld."},
   sobek:  {name:"Sobek",  myth:"egypt", letter:"S", cost:140, damage:35, attackSpeed:0.9, range:110, special:"cone",
            desc:"Krokodilgott. Schlägt kegelförmig und trifft alle Gegner im 110°-Kegel."},
   // ---- ROM ----
-  mars:   {name:"Mars",   myth:"rome",  letter:"M", cost:120, damage:40, attackSpeed:0.6, range:95,  special:"armorpierce",
+  mars:   {name:"Mars",   myth:"rome",  letter:"M", cost:120, damage:40, attackSpeed:0.7, range:105, special:"armorpierce",
            desc:"Kriegsgott. Ignoriert die Rüstung der Gegner komplett."},
   jupiter:{name:"Jupiter",myth:"rome",  letter:"J", cost:150, damage:0, attackSpeed:0, range:140, special:"buff",
            desc:"Götterkönig. Greift nicht an, sondern stärkt alle Türme in Reichweite: +15% Reichweite und +20% Schaden."},
-  bacchus:{name:"Bacchus",myth:"rome",  letter:"B", cost:125, damage:80, attackSpeed:0.1, range:115, special:"wine",
+  bacchus:{name:"Bacchus",myth:"rome",  letter:"B", cost:125, damage:80, attackSpeed:0.2, range:115, special:"wine",
            desc:"Weingott. Langsamer Flächenangriff. Bewirft zwischendurch andere Türme mit Wein und macht sie schneller."},
-  vulcan: {name:"Vulkan", myth:"rome",  letter:"V", cost:135, damage:30, attackSpeed:0.8, range:100, special:"lava",
+  vulcan: {name:"Vulkan", myth:"rome",  letter:"V", cost:135, damage:36, attackSpeed:0.8, range:105, special:"lava",
            desc:"Schmiedegott. Wirft Kugeln, die aufplatzen und Lavapfützen hinterlassen, die Gegner entzünden."},
-  neptune:{name:"Neptun", myth:"rome",  letter:"N", cost:160, damage:17, attackSpeed:0.7, range:105, special:"wave",
+  neptune:{name:"Neptun", myth:"rome",  letter:"N", cost:160, damage:21, attackSpeed:0.7, range:105, special:"wave",
            desc:"Meeresgott. Beschwört eine Welle, die Richtung Start fließt, Schaden macht und Gegner zurückstößt."},
   // ---- GRIECHENLAND ----
-  zeus:   {name:"Zeus",   myth:"greece",letter:"Z", cost:150, damage:22, attackSpeed:0.9, range:120, special:"chain",
+  zeus:   {name:"Zeus",   myth:"greece",letter:"Z", cost:150, damage:24, attackSpeed:1.0, range:120, special:"chain",
            desc:"Donnergott. Blitz springt auf 2 weitere Gegner über."},
-  apollo: {name:"Apollon",myth:"greece",letter:"P", cost:130, damage:24, attackSpeed:1.5, range:115, special:"rapidfire",
+  apollo: {name:"Apollon",myth:"greece",letter:"P", cost:130, damage:24, attackSpeed:1.4, range:115, special:"rapidfire",
            desc:"Lichtgott. Jeder 5. Angriff ist eine Salve aus 4 Pfeilen in schneller Folge."},
-  ares:   {name:"Ares",   myth:"greece",letter:"R", cost:145, damage:43, attackSpeed:0.8, range:90,  special:"splash",
+  ares:   {name:"Ares",   myth:"greece",letter:"R", cost:145, damage:43, attackSpeed:0.8, range:105, special:"splash",
            desc:"Schlachtengott. Explosive Treffer schaden allen in der Nähe."},
   hades:  {name:"Hades",  myth:"greece",letter:"H", cost:140, damage:0, attackSpeed:0, range:110, special:"aura",
            desc:"Gott der Unterwelt. Schwächt Gegner in Reichweite: −10% max. Leben und −40% Rüstung."},
@@ -967,25 +967,25 @@ const TOWER_TYPES={
            desc:"Göttin. Legt Eisflächen auf den Weg, die Gegner um 50% verlangsamen."},
   thor:   {name:"Thor",   myth:"norse", letter:"T", cost:160, damage:42, attackSpeed:0.7, range:110, special:"boomerang",
            desc:"Donnergott. Mjölnir fliegt hindurch und kehrt zurück: 65% hin, 75% zurück."},
-  odin:   {name:"Odin",   myth:"norse", letter:"O", cost:170, damage:48, attackSpeed:0.6, range:130, special:"crit",
+  odin:   {name:"Odin",   myth:"norse", letter:"O", cost:170, damage:48, attackSpeed:0.8, range:130, special:"crit",
            desc:"Allvater. Speer Gungnir trifft mitunter doppelt hart."},
-  loki:   {name:"Loki",   myth:"norse", letter:"L", cost:120, damage:20, attackSpeed:1.8, range:100, special:"trickster",
+  loki:   {name:"Loki",   myth:"norse", letter:"L", cost:120, damage:20, attackSpeed:1.8, range:105, special:"trickster",
            desc:"Trickster. Gegen Bosse: 80% Schaden wenn sie zulaufen, 220% wenn sie weglaufen."},
   // ---- HINDUISMUS ----
   ganesha:{name:"Ganesha",myth:"hindu", letter:"G", cost:115, damage:24, attackSpeed:0.9, range:105, special:"stun",
            desc:"Beseitiger der Hindernisse. Chance, Gegner kurz zu betäuben."},
-  shiva:  {name:"Shiva",  myth:"hindu", letter:"S", cost:145, damage:34, attackSpeed:0.8, range:100, special:"splash",
+  shiva:  {name:"Shiva",  myth:"hindu", letter:"S", cost:145, damage:34, attackSpeed:1.0, range:115, special:"splash",
            desc:"Der Zerstörer. Wuchtige Treffer schaden allen in der Nähe."},
-  rama:   {name:"Rama",   myth:"hindu", letter:"R", cost:130, damage:26, attackSpeed:1.1, range:130, special:"pierce",
+  rama:   {name:"Rama",   myth:"hindu", letter:"R", cost:130, damage:29, attackSpeed:1.1, range:130, special:"pierce",
            desc:"Göttlicher Bogenschütze. Pfeile durchbohren mehrere Gegner."},
   kali:   {name:"Kali",   myth:"hindu", letter:"K", cost:165, damage:30, attackSpeed:1.2, range:110, special:"execute",
            desc:"Göttin der Zeit. Vernichtet stark geschwächte Gegner sofort."},
   // ---- MAYA ----
-  chaac:  {name:"Chaac",      myth:"maya", letter:"C", cost:135, damage:24, attackSpeed:0.9, range:115, special:"chain",
+  chaac:  {name:"Chaac",      myth:"maya", letter:"C", cost:135, damage:32, attackSpeed:0.9, range:115, special:"chain",
            desc:"Regengott. Blitze springen auf weitere Gegner über."},
   ahpuch: {name:"Ah Puch",    myth:"maya", letter:"A", cost:140, damage:16, attackSpeed:1.0, range:105, special:"poison",
            desc:"Todesgott. Gift schadet anteilig am Maximalleben des Ziels."},
-  kukulkan:{name:"Kukulkan",  myth:"maya", letter:"Q", cost:120, damage:18, attackSpeed:1.3, range:110, special:"whirlwind",
+  kukulkan:{name:"Kukulkan",  myth:"maya", letter:"Q", cost:120, damage:23, attackSpeed:1.3, range:110, special:"whirlwind",
            desc:"Gefiederte Schlange. Beschwört einen Wirbelwind, der Gegner mit Schaden über Zeit belegt."},
   hunnalye:{name:"Hun Nal Yeh",myth:"maya",letter:"H", cost:170, damage:22, attackSpeed:0.6, range:125, special:"crit",
            desc:"Maisgott. Schwacher Kämpfer, aber jeder erlegte Gegner bringt Gold – kritische Treffer „ernten“ besonders viel."}
@@ -1000,9 +1000,9 @@ const BUFF_RANGE_STEP=10;        // Reichweiten-Zuwachs pro Jupiter-Upgrade (px)
 // ---------- MYTHOLOGIE-FREISCHALTUNG (Basic sind immer frei) ----
 // Zweistufig: erst Mission erfüllen, dann mit Gold freikaufen.
 const MYTH_UNLOCKS={
-  hindu:{ text:"Töte 100 Gegner", cost:250,
-    missionDone:()=>(state.totalKills||0)>=100,
-    progress:()=>Math.min(100,state.totalKills||0)+" / 100 Gegner getötet" },
+  hindu:{ text:"Töte 75 Gegner", cost:250,
+    missionDone:()=>(state.totalKills||0)>=75,
+    progress:()=>Math.min(75,state.totalKills||0)+" / 75 Gegner getötet" },
   maya:{  text:"Erledige 2 Bosse", cost:500,
     missionDone:()=>(state.bossKills||0)>=2,
     progress:()=>Math.min(2,state.bossKills||0)+" / 2 Bosse erledigt" }
@@ -1046,10 +1046,10 @@ const UNLOCKS={
       return "Thor Lv "+lv("thor")+" · Loki Lv "+lv("loki")+" (Ziel: 4)";
     }
   },
-  kali:{    // Hindu: mind. 100 Kills mit hinduistischen Türmen
-    text:"Erziele 100 Kills mit Hindu-Türmen",
-    check:()=>state.towers.filter(t=>t.myth==="hindu").reduce((s,t)=>s+t.kills,0)>=100,
-    progress:()=>Math.min(100,state.towers.filter(t=>t.myth==="hindu").reduce((s,t)=>s+t.kills,0))+" / 100 Kills"
+  kali:{    // Hindu: mind. 10 Kills mit hinduistischen Türmen
+    text:"Erziele 10 Kills mit Hindu-Türmen",
+    check:()=>state.towers.filter(t=>t.myth==="hindu").reduce((s,t)=>s+t.kills,0)>=10,
+    progress:()=>Math.min(10,state.towers.filter(t=>t.myth==="hindu").reduce((s,t)=>s+t.kills,0))+" / 10 Kills"
   },
   hunnalye:{ // Maya: alle 3 anderen Maya-Türme platziert
     text:"Platziere Chaac, Ah Puch und Kukulkan",
@@ -1228,7 +1228,8 @@ const TVAL={
   hu_bossGoldMult:8,             // Bosse bringen das 8-fache (sie sterben selten, aber lohnen sich)
   // Machtspiele (nur Hun Nal Yeh selbst) – goldorientiert
   hu_maisGold:4,                  // Maissegen: +4 Bonus-Gold je geerntetem Gegner
-  hu_sonneAS:0.20,                // Sonnenkraft: +20% Angriffstempo (für etwas Eigenschaden)
+  hu_sonneAS:0.05,                // Sonnenkraft: +5% Angriffstempo pro Stack (auf je 3 zufällige Türme)
+  hu_sonneDur:3.0,                // Sonnenkraft: Stack-Dauer in Sekunden (Reset bei erneutem Buff)
   hu_weitsichtRange:0.35,         // Weitsicht: +35% Reichweite (größeres Erntefeld)
   hu_ernteRange:0.25,            // Reiche Ernte: +25% Reichweite (mehr Gegner im Erntefeld)
   hu_goldFrac:0.40, hu_goldRadius:70, // Goldene Ernte: Krit-Flächenschaden (40% am Ziel)
@@ -1326,7 +1327,7 @@ const GOD_TALENTS={
     machtspiele:[
       {id:"hu_mais",      name:"Maissegen",      icon:"🌽", desc:"Jeder von Hun Nal Yeh erlegte Gegner bringt zusätzlich +5 Gold."},
       {id:"hu_ernte",     name:"Reiche Ernte",   icon:"🌾", desc:"Vergrößert das Erntefeld (+25% Reichweite) – noch mehr Gegner sterben in Hun Nal Yehs Nähe."},
-      {id:"hu_sonne",     name:"Sonnenkraft",    icon:"☀️", desc:"Erhöhtes Angriffstempo – mehr Tötungen pro Sekunde, also mehr Gold."},
+      {id:"hu_sonne",     name:"Sonnenkraft",    icon:"☀️", desc:"Produziert Hun Nal Yeh Gold, erhalten 3 zufällige Türme für 3 s einen Tempobonus (+5% je Stack, unbegrenzt stapelbar, Timer setzt bei erneutem Buff zurück)."},
       {id:"hu_weitsicht", name:"Weitsicht",      icon:"🦅", desc:"Deutlich mehr Reichweite – erreicht mehr Gegner zum Ernten."},
       {id:"hu_gold",      name:"Goldene Ernte",  icon:"💰", desc:"Kritische Treffer verursachen Flächenschaden UND alle Ernte-Erträge steigen um +30%."}
     ],
@@ -1407,12 +1408,13 @@ const LEGBA={
   setbackDist:160,           // wie weit das Rückkehrtor HINTER dem Eingang liegt (Pfad-dist)
   teleportChance:0.6,        // (1) Chance, dass ein normaler Gegner zurückgesetzt wird
   // (2) Schattenkopie beim Teleport
-  shadowHpFrac:0.25,         // Kopie hat 25% des Max-Lebens des Originals
-  shadowExplodeRadius:55,
+  shadowHpFrac:0.10,         // Kopie hat 10% des Max-Lebens des Originals
+  shadowExplodeRadius:70,
   shadowExplodeFrac:1.0,     // Explosionsschaden = 100% von Legbas Schaden
   shadowKillGold:10,         // Gold-Bonus, wenn eine Schattenkopie getötet wird
   // (3) Seelenprüfung für Elite/Bosse (kein Teleport, stattdessen "Judged")
-  judgedFrac:0.5,            // +50% Schaden beim nächsten Treffer
+  judgedFrac:0.5,            // +50% Schaden aus ALLEN Quellen, solange aktiv
+  judgedDur:2.0,             // Dauer der Seelenprüfung (s)
   // (4) Pfadverwirrung für nicht-teleportierte Gegner
   confuseSlowFactor:0.6,     // −40% Tempo
   confuseDur:1.5
@@ -1429,29 +1431,29 @@ const DAMBALLAH={
   sigilVulnFrac:0.20,        // +20% erlittener Schaden
   // (2) Lichtstrahl bei WIEDERHOLTEN Treffern (egal welcher Turm)
   beamHitsNeeded:5,          // so viele Treffer auf einen markierten Gegner -> Strahl
-  beamFrac:2.0,              // Strahlschaden = 200% von Damballahs Schaden
+  beamFrac:4.0,              // Strahlschaden = 400% von Damballahs Schaden
   beamWidth:22,              // Korridorbreite des Strahls (px)
   beamLen:300,               // Länge des Strahls hinter dem Ziel (px)
   // (3) Sonnenfokus durch VERSCHIEDENE Türme
   focusNeeded:4,             // so viele unterschiedliche Türme -> Fokus-Entladung
-  focusNeededBoss:7,         // gegen Bosse mehr Stacks nötig
+  focusNeededBoss:6,         // gegen Bosse mehr Stacks nötig
   focusFrac:3.0,             // Fokusschaden = 300% (normal)
   focusFracBoss:8.0,         // gegen Bosse stärker
   focusJumpRange:90,         // Übersprung auf nahen markierten Gegner
   // (4) Boss-Fokus: Sun Sigil stapelt langsamer, dafür stärker; bei Max ein massiver Strahl
   bossSigilMax:5,            // Sigil-Stufen am Boss bis zur Entladung
-  bossSigilStrahlFrac:10.0   // massiver Strahl = 1000% bei Max
+  bossSigilStrahlFrac:12.0   // massiver Strahl = 1200% bei Max
 };
 
 // --- Ogou Tonnerre · "War Drum Thunder" (alle Werte vorläufig) ---
 const OGOU={
   // (1) Donnerschlag: jeder N-te Angriff ist ein massiver Blitztreffer
   thunderEvery:3,
-  thunderFrac:3.0,           // Donnerschlag = 300% von Ogous Schaden
+  thunderFrac:3.7,           // Donnerschlag = 370% von Ogous Schaden
   // (2) Kettenblitz: springt auf weitere Gegner; je dichter, desto stärker
   chainJumps:3,
   chainRange:120,            // Sprungreichweite (px)
-  chainFrac:0.6,             // Folge-Schaden = 60% pro Sprung
+  chainFrac:1.0,             // Folge-Schaden = 100% pro Sprung
   densityRadius:90,          // Umkreis zum Zählen "dichter" Gegner
   densityPerEnemy:0.08,      // +8% Donnerschlag-Schaden je Gegner im Umkreis
   densityMax:0.8,            // Deckel des Dichtebonus (+80%)
@@ -1461,7 +1463,8 @@ const OGOU={
   // (4) Kriegstrommel-Aura: Tempo-Buff für nahe Türme bei Boss-Treffer
   drumRange:120,             // Wirkradius der Trommel (px)
   drumASFrac:0.20,           // +20% Angriffstempo je aktivem Trommel-Boost (stapelt)
-  drumDur:3.0                // Dauer eines Boosts (s)
+  drumDur:3.0,               // Dauer eines Boosts (s)
+  drumMaxStacks:10           // Deckel: maximal 10 aktive Trommel-Stapel
 };
 
 // Voodoo-Götter: ein Eintrag je Merge. id = zugleich Talent-id und Voodoo-Typ.
@@ -1905,7 +1908,7 @@ function voodooSpecialInfo(tw,dmg){
         ["Rücksetz-Chance",Math.round(LEGBA.teleportChance*100)+"%"],
         ["Rückwurf-Distanz",LEGBA.setbackDist+" px"],
         ["Schattenkopie",Math.round(LEGBA.shadowHpFrac*100)+"% Max-HP des Originals"],
-        ["Seelenprüfung (Boss)","+"+Math.round(LEGBA.judgedFrac*100)+"% beim nächsten Treffer"],
+        ["Seelenprüfung (Boss)","+"+Math.round(LEGBA.judgedFrac*100)+"% aus allen Quellen / "+LEGBA.judgedDur.toFixed(1)+" s"],
         ["Pfadverwirrung","−"+Math.round((1-LEGBA.confuseSlowFactor)*100)+"% Tempo / "+LEGBA.confuseDur.toFixed(1)+" s"],
         ["Pantheon-Bonus",buff]]};
     case"voodoo4": return {title:"Sonnenschlange (Damballah Solair)",
@@ -2512,7 +2515,7 @@ function mobEffects(en){
   if(en.isBoss&&en.funeralDebt>0) fx.push({ico:"🪦",label:"Funeral Debt ×"+en.funeralDebt});
   if(en.charmT>0) fx.push({ico:"🌹",label:en.isBoss?"Verzaubert (gebannt)":"Verzaubert (rückwärts)"});
   if(en.vulnErzT>0&&!(en.charmT>0)) fx.push({ico:"💋",label:"Rausch (+Schaden)"});
-  if(en.judgedT>0) fx.push({ico:"⚖️",label:"Gerichtet (+Schaden nächster Treffer)"});
+  if(en.judgedT>0) fx.push({ico:"⚖️",label:"Gerichtet (+Schaden aus allen Quellen)"});
   if(en.sunT>0) fx.push({ico:"☀️",label:"Sonnenmal"+(en.isBoss&&en.bossSigil>0?" ("+en.bossSigil+"/"+DAMBALLAH.bossSigilMax+")":"")});
   if(en.isShadow) fx.push({ico:"👤",label:"Schattenkopie (explodiert)"});
   if(en.pushImmune>0) fx.push({ico:"🌊",label:"Rückstoß-Immun"});
@@ -3399,10 +3402,9 @@ function damageEnemy(enemy,dmg,tower,ignoreArmor){
   if(enemy.vulnErzT>0) dmg=dmg*(1+ERZULIE.vulnFrac);
   // Damballah-Sonnenmarkierung: markierte Gegner nehmen mehr Schaden aus ALLEN Quellen.
   if(enemy.sunT>0) dmg=dmg*(1+DAMBALLAH.sigilVulnFrac);
-  // Legba-Seelenprüfung: "Judged" verstärkt den NÄCHSTEN Treffer einmalig, dann verbraucht.
-  if(enemy.judgedT>0 && tower){
+  // Legba-Seelenprüfung: "Judged" verstärkt ALLE Treffer aus ALLEN Quellen, solange der Timer läuft.
+  if(enemy.judgedT>0){
     dmg=dmg*(1+LEGBA.judgedFrac);
-    enemy.judgedT=0; enemy.judgedSource=null;
   }
   const armor=ignoreArmor?0:enemy.armor;
   const real=Math.max(1,dmg-armor);
@@ -3453,6 +3455,18 @@ function damageEnemy(enemy,dmg,tower,ignoreArmor){
         addGold(g);
         harvester.goldEarned=(harvester.goldEarned||0)+g;
         state.effects.push({type:"ring",x:enemy.x,y:enemy.y,t:0.3,color:"#f2cd7a"});
+        // Sonnenkraft: Bei Goldproduktion erhalten 3 zufällige Türme einen stapelbaren
+        // 3s-Speedbuff. Ein Timer pro Turm (Reset bei erneutem Buff), Stacks unbegrenzt.
+        if(hasTalent("hunnalye","hu_sonne") && state.towers.length){
+          const cand=state.towers.slice();
+          for(let n=0;n<3 && cand.length;n++){
+            const idx=Math.floor(Math.random()*cand.length);
+            const tt=cand.splice(idx,1)[0];
+            tt.sonnenStacks=(tt.sonnenStacks||0)+1;   // ein weiterer Stack
+            tt.sonnenT=TVAL.hu_sonneDur;              // Timer auf voll zurücksetzen
+            state.effects.push({type:"ring",x:tt.x,y:tt.y,t:0.3,color:"#f2cd7a"});
+          }
+        }
       }
     }
     state.totalKills++;                       // für Hindu-Mission
@@ -3693,6 +3707,7 @@ function applyErzulieCharm(dt){
     if(en.dead)continue;
     if(en.charmT>0){ en.vulnErzT=en.charmT; }     // verzaubert => verwundbar (gleiche Restdauer)
     else if(en.vulnErzT>0){ en.vulnErzT-=dt; }
+    if(en.judgedT>0){ en.judgedT-=dt; if(en.judgedT<=0){ en.judgedT=0; en.judgedSource=null; } } // Legba-Seelenprüfung läuft ab
   }
 }
 // --- Stun-/Festhalte-Immunität für Bosse -----------------------------------
@@ -3793,7 +3808,7 @@ function legbaGateEnter(en,p){
   const src=p.source;
   if(en.isBoss){
     // (3) Seelenprüfung: Bosse/Elite werden nicht zurückgesetzt, sondern "Judged".
-    en.judgedT=1; en.judgedSource=src;
+    en.judgedT=LEGBA.judgedDur; en.judgedSource=src;
     state.effects.push({type:"ring",x:en.x,y:en.y,t:0.4,color:"#c8a020"});
     return;
   }
@@ -3937,7 +3952,7 @@ function ogouHit(tw,en){
     // (2) Dichtebonus: je mehr Gegner im Umkreis, desto stärker der Donnerschlag
     let near=0;
     for(const o of state.enemies){ if(!o.dead && dist(o.x,o.y,en.x,en.y)<=OGOU.densityRadius) near++; }
-    const densMul=1+Math.min(OGOU.densityMax, OGOU.densityPerEnemy*Math.max(0,near-1));
+    const densMul=1+OGOU.densityPerEnemy*Math.max(0,near-1); // Dichtebonus unbegrenzt
     dmg=base*OGOU.thunderFrac*densMul;
     state.effects.push({type:"ring",x:en.x,y:en.y,t:0.3,color:"#9fb6d8"});
   }
@@ -3964,7 +3979,7 @@ function ogouHit(tw,en){
       if(t===tw)continue;
       if(dist(t.x,t.y,tw.x,tw.y)<=OGOU.drumRange){
         if(!t.drumBoosts)t.drumBoosts=[];
-        t.drumBoosts.push(OGOU.drumDur);
+        if(t.drumBoosts.length<OGOU.drumMaxStacks) t.drumBoosts.push(OGOU.drumDur); // Deckel: max. 10 Stapel
       }
     }
     state.effects.push({type:"ring",x:tw.x,y:tw.y,t:0.4,color:"#ffd24a"});
@@ -4102,6 +4117,7 @@ function update(dt){
     if(enemiesPresent) tw.activeTime=(tw.activeTime||0)+dt; // Leerlauf pausiert die DPS-Zeit
     if(tw.raAttackT>0){ tw.raAttackT-=dt; if(tw.raAttackT<0)tw.raAttackT=0; }
     if(tw.blutdurstT>0){ tw.blutdurstT-=dt; if(tw.blutdurstT<0)tw.blutdurstT=0; } // Kali-Blutdurst
+    if(tw.sonnenT>0){ tw.sonnenT-=dt; if(tw.sonnenT<=0){ tw.sonnenT=0; tw.sonnenStacks=0; } } // Sonnenkraft: Ablauf -> alle Stacks weg
     updatePeriodicTalents(tw,dt); // Zorn des Olymp, Flutwelle, Pralaya
     tw.cooldown-=dt;
     if(tw.nilflutCooldown>0){ tw.nilflutCooldown-=dt; if(tw.nilflutCooldown<0)tw.nilflutCooldown=0; } // Nilflut-Cooldown
@@ -4676,7 +4692,8 @@ function talentASFrac(tw){
   if(tw.myth==="maya"  && mythHasTalent("maya","hu_feder"))       f+=TVAL.hu_federAS;
   // Machtspiele
   if(tw.type==="kali"     && hasTalent("kali","ka_totentanz"))    f+=TVAL.ka_totentanzAS;
-  if(tw.type==="hunnalye" && hasTalent("hunnalye","hu_sonne"))    f+=TVAL.hu_sonneAS;
+  // Sonnenkraft: 5% Tempo pro aktivem Stack (gilt für JEDEN Turm, solange Timer läuft)
+  if((tw.sonnenStacks||0)>0 && (tw.sonnenT||0)>0) f+=TVAL.hu_sonneAS*tw.sonnenStacks;
   // Kali-Blutdurst: zeitlich begrenzter Tempobonus nach einem Kill
   if(tw.type==="kali" && hasTalent("kali","ka_blutdurst") && (tw.blutdurstT||0)>0) f+=TVAL.ka_blutdurstAS;
   return f;
