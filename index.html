@@ -88,7 +88,12 @@
   /* Linke Menüspalte: Banner oben (angeheftet), darunter direkt Boni, Highscores, Steuerung, Welle */
   #leftMenu{width:300px; display:flex; flex-direction:column; gap:14px; align-self:flex-start;}
   /* Highscores: schmale, vertikale Säule – fest am LINKEN Bildschirmrand, vertikal mittig, klappt nach RECHTS aus */
-  #highscorePanel{position:fixed; left:0; top:50%; transform:translateY(-50%); z-index:60;
+  #highscorePanel{position:fixed; left:0; top:calc(50% - 96px); transform:translateY(-50%); z-index:60;
+    width:48px; min-height:140px; padding:10px 4px;
+    display:flex; align-items:center; justify-content:center; overflow:visible;
+    border-top-left-radius:0; border-bottom-left-radius:0;}
+  /* Statistik-Säule: gleiche Optik, direkt unter Highscores gestapelt */
+  #statsBoardPanel{position:fixed; left:0; top:calc(50% + 96px); transform:translateY(-50%); z-index:60;
     width:48px; min-height:140px; padding:10px 4px;
     display:flex; align-items:center; justify-content:center; overflow:visible;
     border-top-left-radius:0; border-bottom-left-radius:0;}
@@ -98,10 +103,24 @@
     color:var(--gold-bright); cursor:pointer; user-select:none; white-space:nowrap;
     text-shadow:0 0 6px rgba(217,178,90,.45);}
   #highscorePanel .hs-vtitle:hover{color:#fff4d0;}
+  #statsBoardPanel .hs-vtitle{
+    writing-mode:vertical-rl; transform:rotate(180deg);
+    font-family:'Caudex', serif; font-weight:700; font-size:16px; letter-spacing:3px;
+    color:var(--gold-bright); cursor:pointer; user-select:none; white-space:nowrap;
+    text-shadow:0 0 6px rgba(217,178,90,.45);}
+  #statsBoardPanel .hs-vtitle:hover{color:#fff4d0;}
   /* Ausklapp-Inhalt: schwebt rechts neben der Säule, schiebt das Layout nicht */
   #highscoreFlyout{
     position:absolute; left:calc(100% + 10px); top:50%; transform:translateY(-50%);
-    width:340px; max-height:none;
+    width:340px; max-height:calc(100vh - 32px); overflow-y:auto; overscroll-behavior:contain;
+    background:linear-gradient(180deg, var(--panel) 0%, #120f1a 100%);
+    border:1px solid var(--panel-line); border-radius:10px; padding:16px;
+    box-shadow:0 18px 40px rgba(0,0,0,.55); z-index:61;
+    transform-origin:left center;
+    transition:opacity .18s ease, transform .18s ease;}
+  #statsBoardFlyout{
+    position:absolute; left:calc(100% + 10px); top:50%; transform:translateY(-50%);
+    width:340px; max-height:calc(100vh - 32px); overflow-y:auto; overscroll-behavior:contain;
     background:linear-gradient(180deg, var(--panel) 0%, #120f1a 100%);
     border:1px solid var(--panel-line); border-radius:10px; padding:16px;
     box-shadow:0 18px 40px rgba(0,0,0,.55); z-index:61;
@@ -109,6 +128,8 @@
     transition:opacity .18s ease, transform .18s ease;}
   /* Eingeklappt: Flyout ausgeblendet, nur die Säule mit dem gedrehten Titel sichtbar */
   #highscorePanel.collapsed #highscoreFlyout{
+    opacity:0; transform:translateY(-50%) scaleX(.85); pointer-events:none; visibility:hidden;}
+  #statsBoardPanel.collapsed #statsBoardFlyout{
     opacity:0; transform:translateY(-50%) scaleX(.85); pointer-events:none; visibility:hidden;}
   /* Rechte Spalte: Baumenü oben, darunter Informationen */
   #side{width:360px; display:flex; flex-direction:column; gap:14px; align-self:flex-start;}
@@ -591,6 +612,12 @@
   <div class="hs-vtitle collapsible" onclick="toggleCollapse('highscorePanel')">Highscores</div>
   <div class="panel-body" id="highscoreFlyout">
     <div id="highscoreBody"></div>
+  </div>
+</div>
+<div class="panel collapsed" id="statsBoardPanel">
+  <div class="hs-vtitle collapsible" onclick="openStatsPanel()">Statistiken</div>
+  <div class="panel-body" id="statsBoardFlyout">
+    <div id="statsBoardBody"></div>
   </div>
 </div>
 <div id="wrap">
@@ -1994,8 +2021,12 @@ function freshState(){
     speed:1, showRange:false, autoWave:false, nextTowerId:1, paused:false, typeCounts:{}, greeceUnlocked:false, rewarded:{}, bestWave:0,
     rewardDone:{},
     fieldChoiceDone:{}, awaitingFieldPlacement:null, // Bonusfeld-Auswahl nach Welle 5
-    totalKills:0, totalUpgrades:0, totalGold:0, bossKills:0, mythBought:{}, gameBonus:null, talents:{}, gameTime:0,
+    totalKills:0, totalUpgrades:0, totalGold:0, bossKills:0, livesLost:0, maxLivesHeld:20, mythBought:{}, gameBonus:null, talents:{}, gameTime:0,
     synergyUnlocked:{}, voodooMerged:{}, portals:[]};
+}
+// Merkt sich den höchsten Lebensstand dieser Runde (für "Überflieger").
+function bumpMaxLives(){
+  if((state.lives||0) > (state.maxLivesHeld||0)) state.maxLivesHeld = state.lives;
 }
 // Gold-Hilfsfunktion mit Spielbonus
 function addGold(amount){
@@ -2151,7 +2182,7 @@ function placeFieldBonusAt(mx,my){
 }
 function applyRewardPrize(id){
   if(id==="gold"){ state.gold+=1000; }
-  else if(id==="lives"){ state.lives+=15; }
+  else if(id==="lives"){ state.lives+=15; bumpMaxLives(); }
   else if(id==="dmgfield"){ markBoostOnFreeSlot("dmg"); }
   else if(id==="asfield"){ markBoostOnFreeSlot("as"); }
   else if(id==="slots"){ addExtraSlots(2); }
@@ -2208,7 +2239,7 @@ function beginNextWave(){
   if(state.queued<=0||state.wave>=state.maxWaves)return;
   state.queued--;
   state.wave++;state.spawnQueue=buildWave(state.wave);
-  if(state.gameBonus==="life")state.lives++; // +1 Leben pro Welle
+  if(state.gameBonus==="life"){state.lives++; bumpMaxLives();} // +1 Leben pro Welle
   if(state.wave>=5&&state.lives>=8)state.greeceUnlocked=true; // Zeus-Mission
   if(state.wave>state.bestWave)state.bestWave=state.wave;     // höchste erreichte Welle (Mythologie-Freischaltung)
   // Beim Erreichen von Welle 20 werden die Punkte 6–10 freigeschaltet: alle Hauptgötter neu rechnen.
@@ -4052,7 +4083,7 @@ function update(dt){
       }
     }
     const p=posOnPath(en.dist,CURRENT_MAP.path);en.x=p.x;en.y=p.y;
-    if(en.dist>=PATH_LEN){en.reached=true;en.dead=true;if(!en.isShadow){state.lives-=en.isBoss?4:1;if(state.lives<0)state.lives=0;updateUI();if(state.lives<=0)loseGame();}}
+    if(en.dist>=PATH_LEN){en.reached=true;en.dead=true;if(!en.isShadow){const _lost=en.isBoss?4:1;state.livesLost=(state.livesLost||0)+_lost;state.lives-=_lost;if(state.lives<0)state.lives=0;updateUI();if(state.lives<=0)loseGame();}}
   }
   const enemiesPresent = state.enemies.some(e=>!e.dead);
   for(const tw of state.towers){
@@ -5626,6 +5657,7 @@ function winGame(){
   document.getElementById('endText').innerHTML="Du hast alle 30 Wellen überstanden! Die alten Götter feiern deinen Triumph. 🎆";
   // Nach dem klassischen Sieg darf man ins Endlosspiel wechseln
   showScoreEntry({mode:"classic", canEndless:true});
+  showAchievementToasts(recordGameEnd("classic"));
 }
 function loseGame(){
   state.running=false;state.lost=true;const ov=document.getElementById('endOverlay');
@@ -5634,9 +5666,11 @@ function loseGame(){
   if(state.endless){
     document.getElementById('endText').textContent="Deine Verteidigung ist gefallen. Du hast im Endlosspiel Welle "+state.wave+" erreicht.";
     showScoreEntry({mode:"endless", canEndless:false});
+    showAchievementToasts(recordGameEnd("endless"));
   } else {
     document.getElementById('endText').textContent="Deine Verteidigung ist gefallen. Du hast Welle "+state.wave+" erreicht.";
     showScoreEntry({mode:"classic", canEndless:false});
+    showAchievementToasts(recordGameEnd("classic"));
   }
 }
 // Endlosspiel ab Welle 30 fortsetzen: gleiche Türme, Gold, Leben behalten
@@ -5818,6 +5852,123 @@ alignLeftMenu();
 if(document.fonts&&document.fonts.ready){document.fonts.ready.then(alignLeftMenu);}
 window.addEventListener('load',alignLeftMenu);
 requestAnimationFrame(loop);
+
+/* =====================================================================
+   PERSISTENTE STATISTIKEN & ACHIEVEMENTS
+   Eigenständige Schicht über dem Spiel. Greift NICHT in Missionen ein.
+   Ein localStorage-Key, ein load/save-Paar — später leicht auf
+   Firebase-Accounts umstellbar (nur loadStats/saveStats tauschen).
+   ===================================================================== */
+const STATS_KEY="md_stats_local", STATS_VERSION=1;
+let _statsFallback=null;
+function emptyStats(){
+  return {v:STATS_VERSION, created:Date.now(), updated:Date.now(),
+    games:0, wins:0, totalKills:0, totalBossKills:0, totalGold:0, totalUpgrades:0,
+    playTime:0, bestWaveClassic:0, bestWaveEndless:0, flawlessClassicWins:0, bestMaxLives:0,
+    perTower:{}, perMyth:{}, builtTypes:{}, unlocked:{}};
+}
+function mergeStats(saved){
+  const base=emptyStats();
+  if(!saved||typeof saved!=="object")return base;
+  for(const k in base){
+    if(saved[k]===undefined)continue;
+    if(k==="perTower"||k==="perMyth"||k==="builtTypes"||k==="unlocked")base[k]=Object.assign({},saved[k]||{});
+    else base[k]=saved[k];
+  }
+  base.v=STATS_VERSION; return base;
+}
+function loadStats(){
+  try{const raw=localStorage.getItem(STATS_KEY);return mergeStats(raw?JSON.parse(raw):null);}
+  catch(e){return _statsFallback?mergeStats(_statsFallback):emptyStats();}
+}
+function saveStats(s){s.updated=Date.now();_statsFallback=s;try{localStorage.setItem(STATS_KEY,JSON.stringify(s));}catch(e){}}
+
+const TOWER_TYPE_COUNT=Object.keys(TOWER_TYPES).length;
+const ACHIEVEMENTS=[
+  {id:"first_blood", icon:"⚔️", title:"Erstes Blut",  desc:"Beende deine erste Runde.",                              check:s=>s.games>=1},
+  {id:"classic_win", icon:"🏛", title:"Verteidiger",   desc:"Erreiche und überstehe Welle 30.",                       check:s=>s.wins>=1},
+  {id:"flawless",    icon:"🛡", title:"Makellos",      desc:"Schaffe Welle 30, ohne ein einziges Leben zu verlieren.",check:s=>s.flawlessClassicWins>=1},
+  {id:"endless_25",  icon:"♾", title:"Grenzgänger",   desc:"Erreiche Welle 25 im Endlosspiel.",                      check:s=>s.bestWaveEndless>=25},
+  {id:"endless_50",  icon:"🌌", title:"Unaufhaltsam",  desc:"Erreiche Welle 50 im Endlosspiel.",                      check:s=>s.bestWaveEndless>=50},
+  {id:"slayer_1k",   icon:"💀", title:"Schlächter",    desc:"Besiege insgesamt 1.000 Gegner.",                        check:s=>s.totalKills>=1000},
+  {id:"boss_hunter", icon:"👑", title:"Bossjäger",     desc:"Besiege insgesamt 25 Bosse.",                            check:s=>s.totalBossKills>=25},
+  {id:"rich",        icon:"🪙", title:"Pharaonenschatz",desc:"Verdiene insgesamt 100.000 Gold.",                      check:s=>s.totalGold>=100000},
+  {id:"collector",   icon:"📜", title:"Pantheon-Sammler",desc:"Baue jeden Turm-Typ mindestens einmal.",              check:s=>Object.keys(s.builtTypes).length>=TOWER_TYPE_COUNT},
+  {id:"overflow",    icon:"💚", title:"Überflieger",   desc:"Habe in einer Runde mindestens 50 Leben gleichzeitig.",  check:s=>s.bestMaxLives>=50},
+  {id:"veteran",     icon:"⏳", title:"Veteran",       desc:"Spiele insgesamt 2 Stunden.",                            check:s=>s.playTime>=7200},
+];
+
+function recordGameEnd(mode){
+  const s=loadStats();
+  const won=!!state.won;
+  const endless=(mode==="endless")||!!state.endless;
+  s.games+=1;
+  s.totalKills    +=(state.totalKills||0);
+  s.totalBossKills+=(state.bossKills||0);
+  s.totalGold     +=(state.totalGold||0);
+  s.totalUpgrades +=(state.totalUpgrades||0);
+  s.playTime      +=Math.round(state.gameTime||0);
+  s.bestMaxLives=Math.max(s.bestMaxLives, state.maxLivesHeld||state.lives||0);
+  if(endless){
+    s.bestWaveEndless=Math.max(s.bestWaveEndless,state.wave||0);
+  }else{
+    s.bestWaveClassic=Math.max(s.bestWaveClassic,state.wave||0);
+    if(won){ s.wins+=1; if((state.livesLost||0)===0) s.flawlessClassicWins+=1; }
+  }
+  const mythUsed={};
+  for(const t of (state.towers||[])){
+    const pt=s.perTower[t.type]||(s.perTower[t.type]={built:0,dmg:0,kills:0});
+    pt.built+=1; pt.dmg+=Math.round(t.dmgDealt||0); pt.kills+=(t.kills||0);
+    s.builtTypes[t.type]=true;
+    const info=TOWER_TYPES[t.type]; const myth=info?info.myth:(t.myth||"?");
+    const pm=s.perMyth[myth]||(s.perMyth[myth]={gamesUsed:0,dmg:0});
+    pm.dmg+=Math.round(t.dmgDealt||0); mythUsed[myth]=true;
+  }
+  for(const m in mythUsed) s.perMyth[m].gamesUsed+=1;
+  const newly=[];
+  for(const a of ACHIEVEMENTS){ if(s.unlocked[a.id])continue; if(a.check(s)){s.unlocked[a.id]=Date.now();newly.push(a);} }
+  saveStats(s);
+  return newly;
+}
+
+function showAchievementToasts(list){
+  if(!list||!list.length)return;
+  let host=document.getElementById('achToastHost');
+  if(!host){host=document.createElement('div');host.id='achToastHost';
+    host.style.cssText="position:fixed;right:18px;bottom:18px;z-index:200;display:flex;flex-direction:column;gap:10px;pointer-events:none;";
+    document.body.appendChild(host);}
+  list.forEach((a,i)=>setTimeout(()=>{
+    const el=document.createElement('div');
+    el.style.cssText="pointer-events:auto;min-width:240px;max-width:320px;background:linear-gradient(180deg,#16131f,#120f1a);border:1px solid var(--gold);border-radius:10px;padding:12px 14px;box-shadow:0 10px 30px rgba(0,0,0,.5),0 0 18px rgba(217,178,90,.25);color:var(--text);font-family:'Marcellus',serif;opacity:0;transform:translateY(12px);transition:opacity .25s,transform .25s;";
+    el.innerHTML=`<div style="font-family:'Caudex',serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--gold-bright);">Achievement freigeschaltet</div><div style="display:flex;align-items:center;gap:10px;margin-top:6px;"><span style="font-size:24px;">${a.icon}</span><div><div style="font-weight:700;">${a.title}</div><div style="font-size:12px;color:var(--muted);">${a.desc}</div></div></div>`;
+    host.appendChild(el);
+    requestAnimationFrame(()=>{el.style.opacity="1";el.style.transform="translateY(0)";});
+    setTimeout(()=>{el.style.opacity="0";el.style.transform="translateY(12px)";setTimeout(()=>el.remove(),300);},5000);
+  },i*350));
+}
+
+function fmtNum(n){return Number(n||0).toLocaleString("de-DE");}
+function fmtTime(sec){sec=Math.round(sec||0);const h=Math.floor(sec/3600),m=Math.floor((sec%3600)/60);return h>0?`${h} h ${m} min`:`${m} min`;}
+function buildStatsOverview(){
+  const s=loadStats();
+  let favMyth="–",favG=-1; for(const m in s.perMyth){if(s.perMyth[m].gamesUsed>favG){favG=s.perMyth[m].gamesUsed;favMyth=(MYTHS[m]?MYTHS[m].name:m);}}
+  let topTower="–",topD=-1; for(const t in s.perTower){if(s.perTower[t].dmg>topD){topD=s.perTower[t].dmg;topTower=(TOWER_TYPES[t]?TOWER_TYPES[t].name:t);}}
+  const rows=[["Gespielte Runden",fmtNum(s.games)],["Siege (Welle 30)",fmtNum(s.wins)],["Beste Welle · Klassisch",fmtNum(s.bestWaveClassic)],["Beste Welle · Endlos",fmtNum(s.bestWaveEndless)],["Gegner besiegt",fmtNum(s.totalKills)],["Bosse besiegt",fmtNum(s.totalBossKills)],["Gold verdient",fmtNum(s.totalGold)],["Spielzeit",fmtTime(s.playTime)],["Lieblings-Mythologie",favMyth],["Stärkster Turm",topTower]]
+    .map(r=>`<div style="display:flex;justify-content:space-between;gap:12px;padding:5px 0;border-bottom:1px solid rgba(43,36,56,.5);"><span style="color:var(--muted);font-size:13px;">${r[0]}</span><span style="font-family:'Caudex',serif;font-weight:700;font-variant-numeric:tabular-nums;">${r[1]}</span></div>`).join("");
+  const total=ACHIEVEMENTS.length, got=Object.keys(s.unlocked).length;
+  const cards=ACHIEVEMENTS.map(a=>{const done=!!s.unlocked[a.id];
+    return `<div style="display:flex;gap:10px;align-items:flex-start;padding:8px;border:1px solid var(--panel-line);border-radius:8px;background:${done?'rgba(217,178,90,.08)':'#0e0b16'};opacity:${done?1:.55};"><span style="font-size:20px;filter:${done?'none':'grayscale(1)'};">${done?a.icon:'🔒'}</span><div><div style="font-weight:700;">${a.title}</div><div style="font-size:12px;color:var(--muted);">${a.desc}</div></div></div>`;}).join("");
+  return `<div style="font-family:'Caudex',serif;font-weight:700;letter-spacing:2px;color:var(--gold-bright);text-transform:uppercase;font-size:12px;margin-bottom:8px;">Statistiken</div>`+rows+
+    `<div style="font-family:'Caudex',serif;font-weight:700;letter-spacing:2px;color:var(--gold-bright);text-transform:uppercase;font-size:12px;margin:16px 0 8px;">Achievements · ${got}/${total}</div><div style="display:grid;grid-template-columns:1fr;gap:8px;">${cards}</div>`;
+}
+
+// Öffnet das Statistik-Panel und rendert den Inhalt frisch.
+function openStatsPanel(){
+  const body=document.getElementById('statsBoardBody');
+  if(body) body.innerHTML=buildStatsOverview();
+  toggleCollapse('statsBoardPanel');
+}
+window.loadStats=loadStats; window.recordGameEnd=recordGameEnd; window.buildStatsOverview=buildStatsOverview;
 </script>
 </body>
 </html>
