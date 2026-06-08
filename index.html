@@ -5951,7 +5951,7 @@ function fmtNum(n){return Number(n||0).toLocaleString("de-DE");}
 function fmtTime(sec){sec=Math.round(sec||0);const h=Math.floor(sec/3600),m=Math.floor((sec%3600)/60);return h>0?`${h} h ${m} min`:`${m} min`;}
 function buildStatsOverview(){
   const s=loadStats();
-  let favMyth="–",favG=-1; for(const m in s.perMyth){if(s.perMyth[m].gamesUsed>favG){favG=s.perMyth[m].gamesUsed;favMyth=(MYTHS[m]?MYTHS[m].name:m);}}
+  let favMyth="–",favG=-1; for(const m in s.perMyth){if(s.perMyth[m].gamesUsed>favG){favG=s.perMyth[m].gamesUsed;favMyth=(MYTHOLOGIES[m]?MYTHOLOGIES[m].name:m);}}
   let topTower="–",topD=-1; for(const t in s.perTower){if(s.perTower[t].dmg>topD){topD=s.perTower[t].dmg;topTower=(TOWER_TYPES[t]?TOWER_TYPES[t].name:t);}}
   const rows=[["Gespielte Runden",fmtNum(s.games)],["Siege (Welle 30)",fmtNum(s.wins)],["Beste Welle · Klassisch",fmtNum(s.bestWaveClassic)],["Beste Welle · Endlos",fmtNum(s.bestWaveEndless)],["Gegner besiegt",fmtNum(s.totalKills)],["Bosse besiegt",fmtNum(s.totalBossKills)],["Gold verdient",fmtNum(s.totalGold)],["Spielzeit",fmtTime(s.playTime)],["Lieblings-Mythologie",favMyth],["Stärkster Turm",topTower]]
     .map(r=>`<div style="display:flex;justify-content:space-between;gap:12px;padding:5px 0;border-bottom:1px solid rgba(43,36,56,.5);"><span style="color:var(--muted);font-size:13px;">${r[0]}</span><span style="font-family:'Caudex',serif;font-weight:700;font-variant-numeric:tabular-nums;">${r[1]}</span></div>`).join("");
@@ -5965,7 +5965,12 @@ function buildStatsOverview(){
 // Öffnet das Statistik-Panel und rendert den Inhalt frisch.
 function openStatsPanel(){
   const body=document.getElementById('statsBoardBody');
-  if(body) body.innerHTML=buildStatsOverview();
+  try{
+    if(body) body.innerHTML=buildStatsOverview();
+  }catch(e){
+    if(body) body.innerHTML='<div style="color:var(--muted);font-size:13px;">Statistiken konnten nicht geladen werden.</div>';
+    console.error('Statistik-Render-Fehler:',e);
+  }
   toggleCollapse('statsBoardPanel');
 }
 window.loadStats=loadStats; window.recordGameEnd=recordGameEnd; window.buildStatsOverview=buildStatsOverview;
